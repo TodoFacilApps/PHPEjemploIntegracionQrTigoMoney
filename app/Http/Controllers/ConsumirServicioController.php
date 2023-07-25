@@ -66,6 +66,9 @@ class ConsumirServicioController extends Controller
 
                 echo '<h5 class="text-center mb-4">' . $laResult->message . '</h5>';
                 echo '<p class="blue-text">Transacción Generada: </p><p id="tnTransaccion" class="blue-text">'. $laResult->values . '</p><br>';
+                echo '<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>';
+                echo '<script> $(document).ready(function() { setInterval(function() { hacerSolicitudAjax(' . $laResult->values . '); }, 10000); }); </script>';
+            
             }
         } catch (\Throwable $th) {
 
@@ -75,6 +78,7 @@ class ConsumirServicioController extends Controller
 
     public function ConsultarEstado(Request $request)
     {
+        $lnTransaccion = $request->tnTransaccion;
         
         $loClientEstado = new Client();
 
@@ -85,22 +89,18 @@ class ConsumirServicioController extends Controller
         ];
 
         $laBodyEstadoTransaccion = [
-            "TransaccionDePago" => @$laResult->values
+            "TransaccionDePago" => $lnTransaccion
         ];
 
-        for ($i = 0; $i < 5; $i++) {
+        $loEstadoTransaccion = $loClientEstado->post($lcUrlEstadoTransaccion, [
+            'headers' => $laHeaderEstadoTransaccion,
+            'json' => $laBodyEstadoTransaccion
+        ]);
 
+        $laResultEstadoTransaccion = json_decode($loEstadoTransaccion->getBody()->getContents());
 
-            $loEstadoTransaccion = $loClientEstado->post($lcUrlEstadoTransaccion, [
-                'headers' => $laHeaderEstadoTransaccion,
-                'json' => $laBodyEstadoTransaccion
-            ]);
+        $texto = '<h5 class="text-center mb-4">Estado Transacción: ' . $laResultEstadoTransaccion->values->messageEstado . '</h5><br>';
 
-            $laResultEstadoTransaccion = json_decode($loEstadoTransaccion->getBody()->getContents());
-
-            echo '<h5 class="text-center mb-4">Estado Transacción: ' . $laResultEstadoTransaccion->values->messageEstado . '</h5><br>';
-
-            sleep(3);
-        }
+        return response()->json(['message' => $texto]);
     }
 }

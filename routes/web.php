@@ -19,3 +19,4 @@ Route::get('/', function () {
 });
 
 Route::post('/consumirServicio', [ConsumirServicioController::class, 'RecolectarDatos']);
+Route::post('/consultar', [ConsumirServicioController::class, 'ConsultarEstado']);
