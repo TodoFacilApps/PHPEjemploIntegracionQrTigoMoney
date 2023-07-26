@@ -64,10 +64,41 @@ class ConsumirServicioController extends Controller
                 echo '<img src="' . $laQrImage . '" alt="Imagen base64">';
             } elseif ($request->tnTipoServicio == 2) {
 
+                $csrfToken = csrf_token();
+
                 echo '<h5 class="text-center mb-4">' . $laResult->message . '</h5>';
                 echo '<p class="blue-text">Transacción Generada: </p><p id="tnTransaccion" class="blue-text">'. $laResult->values . '</p><br>';
                 echo '<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>';
-                echo '<script> $(document).ready(function() { setInterval(function() { hacerSolicitudAjax(' . $laResult->values . '); }, 10000); }); </script>';
+
+                echo '<script>
+                    $(document).ready(function() {
+                        function hacerSolicitudAjax(numero) {
+                            // Agrega el token CSRF al objeto de datos
+                            var data = { _token: "' . $csrfToken . '", tnTransaccion: numero };
+                            
+                            $.ajax({
+                                url: \'/consultar\',
+                                type: \'POST\',
+                                data: data,
+                                success: function(response) {
+                                    var iframe = document.getElementsByName(\'QrImage\')[0];
+                                    iframe.contentDocument.open();
+                                    iframe.contentDocument.write(response.message);
+                                    iframe.contentDocument.close();
+                                },
+                                error: function(error) {
+                                    console.error(error);
+                                }
+                            });
+                        }
+
+                        setInterval(function() {
+                            hacerSolicitudAjax(' . $laResult->values . ');
+                        }, 10000);
+                    });
+                </script>';
+
+
             
             }
         } catch (\Throwable $th) {
