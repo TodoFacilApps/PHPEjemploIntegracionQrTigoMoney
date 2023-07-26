@@ -14,7 +14,7 @@
     <div class="container-fluid py-5">
         <div class="row justify-content-center">
             <div class="col-xl-6 col-lg-6 col-md-6 col-12 text-center">
-                <h3>PagoFacil QR</h3>
+                <h3>PagoFacil QR y Tigo Money</h3>
                 <p class="blue-text">Proyecto de ejemplo de integración de servicios PagoFacil.<br></p>
                 <div class="card">
                     <h5 class="text-center mb-4">Laravel</h5>
