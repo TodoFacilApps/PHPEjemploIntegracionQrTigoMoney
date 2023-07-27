@@ -76,7 +76,7 @@ class ConsumirServicioController extends Controller
                             function hacerSolicitudAjax(numero) {
                                 // Agrega el token CSRF al objeto de datos
                                 var data = { _token: "' . $csrfToken . '", tnTransaccion: numero };
-                                
+
                                 $.ajax({
                                     url: \'/consultar\',
                                     type: \'POST\',
@@ -100,7 +100,7 @@ class ConsumirServicioController extends Controller
                     </script>';
 
 
-            
+
             }
         } catch (\Throwable $th) {
 
@@ -111,7 +111,7 @@ class ConsumirServicioController extends Controller
     public function ConsultarEstado(Request $request)
     {
         $lnTransaccion = $request->tnTransaccion;
-        
+
         $loClientEstado = new Client();
 
         $lcUrlEstadoTransaccion = "https://serviciostigomoney.pagofacil.com.bo/api/servicio/consultartransaccion";
@@ -134,5 +134,24 @@ class ConsumirServicioController extends Controller
         $texto = '<h5 class="text-center mb-4">Estado Transacción: ' . $laResultEstadoTransaccion->values->messageEstado . '</h5><br>';
 
         return response()->json(['message' => $texto]);
+    }
+
+    public function urlCallback(Request $request)
+    {
+        $Venta = $request->input("PedidoID");
+        $Fecha = $request->input("Fecha");
+        $NuevaFecha = date("Y-m-d", strtotime($Fecha));
+        $Hora = $request->input("Hora");
+        $MetodoPago = $request->input("MetodoPago");
+        $Estado = $request->input("Estado");
+        $Ingreso = true;
+
+        try {
+            $arreglo = ['error' => 0, 'status' => 1, 'message' => "Pago realizado correctamente.", 'Values' => true];
+        } catch (\Throwable $th) {
+            $arreglo = ['error' => 1, 'status' => 1, 'messageSistema' => "[TRY/CATCH] " . $th->getMessage(), 'message' => "No se pudo realizar el pago, por favor intente de nuevo.", 'Values' => false];
+        }
+
+        return response()->json($arreglo);
     }
 }
